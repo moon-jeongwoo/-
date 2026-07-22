@@ -13,7 +13,8 @@
     <h1>날씨 조회</h1>
 
     <form id="search-form">
-      <input type="text" id="city-input" placeholder="도시 이름 (예: Seoul)" required />
+      <input type="text" id="city-input" list="city-list" placeholder="도시 이름 (예: Seoul, 서울)" required autocomplete="off" />
+      <datalist id="city-list"></datalist>
       <button type="submit">검색</button>
     </form>
 

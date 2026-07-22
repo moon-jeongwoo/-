@@ -100,15 +100,96 @@
   sunGroup.visible = false;
   scene.add(sunGroup);
 
-  // ---------- 구름 ----------
+  // ---------- 구름 (플랫 디자인 아이콘 스타일) ----------
+  function createCloudTexture() {
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+
+    const puffs = [
+      { x: 0.5, y: 0.54, r: 0.32 },
+      { x: 0.27, y: 0.6, r: 0.23 },
+      { x: 0.75, y: 0.6, r: 0.24 },
+      { x: 0.38, y: 0.41, r: 0.21 },
+      { x: 0.64, y: 0.41, r: 0.21 },
+      { x: 0.5, y: 0.33, r: 0.19 },
+    ];
+    const base = { x: 0.5, y: 0.66, w: 0.6, h: 0.2 };
+
+    function drawSilhouette(offsetY) {
+      puffs.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x * size, (p.y + offsetY) * size, p.r * size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.beginPath();
+      ctx.ellipse(
+        base.x * size,
+        (base.y + offsetY) * size,
+        (base.w / 2) * size,
+        (base.h / 2) * size,
+        0,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+
+    // 아래로 살짝 띄운 부드러운 그림자
+    ctx.save();
+    ctx.filter = "blur(8px)";
+    ctx.fillStyle = "rgba(120,138,162,0.4)";
+    drawSilhouette(0.06);
+    ctx.restore();
+
+    // 이음새 없이 하나로 붙는 불투명한 흰 실루엣
+    ctx.fillStyle = "#ffffff";
+    drawSilhouette(0);
+
+    // 실루엣 안쪽에만 은은한 그라데이션 음영
+    ctx.globalCompositeOperation = "source-atop";
+    const shade = ctx.createLinearGradient(0, size * 0.2, 0, size * 0.88);
+    shade.addColorStop(0, "rgba(255,255,255,0)");
+    shade.addColorStop(1, "rgba(178,193,214,0.4)");
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, size, size);
+    ctx.globalCompositeOperation = "source-over";
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+  const cloudTexture = createCloudTexture();
+  const cloudMaterials = [];
+
+  function makeCloudMaterial() {
+    const material = new THREE.SpriteMaterial({
+      map: cloudTexture,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+      rotation: (Math.random() - 0.5) * 0.1,
+    });
+    cloudMaterials.push(material);
+    return material;
+  }
+
   function makeCloud() {
     const group = new THREE.Group();
-    const mat = new THREE.MeshLambertMaterial({ color: 0xf2f4f7 });
-    const puffs = 5 + Math.floor(Math.random() * 3);
-    for (let i = 0; i < puffs; i++) {
-      const puff = new THREE.Mesh(new THREE.SphereGeometry(1 + Math.random() * 0.8, 12, 12), mat);
-      puff.position.set(i * 1.2 - puffs * 0.6, Math.random() * 0.6, Math.random() * 0.6);
-      group.add(puff);
+    const count = Math.random() < 0.3 ? 2 : 1;
+    for (let i = 0; i < count; i++) {
+      const sprite = new THREE.Sprite(makeCloudMaterial());
+      const size = 5 + Math.random() * 2.5;
+      sprite.scale.set(size * 1.6, size, 1);
+      sprite.position.set(
+        (Math.random() - 0.5) * 2.5,
+        (Math.random() - 0.5) * 0.6,
+        (Math.random() - 0.5) * 0.4
+      );
+      group.add(sprite);
     }
     return group;
   }
@@ -167,6 +248,7 @@
     sunGroup.visible = false;
     clouds.forEach((c) => (c.visible = false));
     sunLight.intensity = 0.6;
+    cloudMaterials.forEach((m) => m.color.set(isNight ? 0x9aa0ab : 0xffffff));
 
     let bg = "#4facfe, #00f2fe";
 
