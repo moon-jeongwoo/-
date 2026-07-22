@@ -33,18 +33,6 @@ locateBtn.addEventListener("click", () => {
   );
 });
 
-// 페이지 로드 시 위치 권한이 이미 허용되어 있다면 자동으로 조회
-window.addEventListener("DOMContentLoaded", () => {
-  if (!navigator.geolocation || !navigator.permissions) return;
-  navigator.permissions.query({ name: "geolocation" }).then((status) => {
-    if (status.state === "granted") {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        loadWeather({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-      });
-    }
-  });
-});
-
 async function loadWeather(location) {
   result.classList.add("hidden");
   forecastEl.classList.add("hidden");
