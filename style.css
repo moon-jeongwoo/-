@@ -161,11 +161,17 @@ button:hover {
   height: 32px;
 }
 
-.forecast-temp {
-  margin: 0;
+.forecast-temp-max {
+  margin: 2px 0 0;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #333;
+  color: #d9480f;
+}
+
+.forecast-temp-min {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: #4263eb;
 }
 
 .error {

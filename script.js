@@ -63,7 +63,7 @@ async function loadWeather(location) {
 
     const list = await fetchForecast({ lat: current.coord.lat, lon: current.coord.lon });
     showHourly(list.slice(0, 8));
-    showForecast(list.filter((entry) => entry.dt_txt.includes("12:00:00")).slice(0, 5));
+    showForecast(groupForecastByDay(list).slice(0, 5));
   } catch (err) {
     showError(err.message);
   }
@@ -120,6 +120,34 @@ function showResult(data) {
   result.classList.remove("hidden");
 }
 
+function groupForecastByDay(list) {
+  const days = {};
+
+  list.forEach((entry) => {
+    const [date, time] = entry.dt_txt.split(" ");
+    if (!days[date]) {
+      const [, month, day] = date.split("-");
+      days[date] = {
+        label: `${Number(month)}/${Number(day)}`,
+        min: entry.main.temp_min,
+        max: entry.main.temp_max,
+        icon: entry.weather[0].icon,
+        description: entry.weather[0].description,
+      };
+    }
+
+    const d = days[date];
+    d.min = Math.min(d.min, entry.main.temp_min);
+    d.max = Math.max(d.max, entry.main.temp_max);
+    if (time === "12:00:00") {
+      d.icon = entry.weather[0].icon;
+      d.description = entry.weather[0].description;
+    }
+  });
+
+  return Object.values(days);
+}
+
 function showForecast(days) {
   if (!days.length) {
     forecastEl.classList.add("hidden");
@@ -127,17 +155,16 @@ function showForecast(days) {
   }
 
   forecastEl.innerHTML = days
-    .map((day) => {
-      const date = new Date(day.dt_txt);
-      const label = `${date.getMonth() + 1}/${date.getDate()}`;
-      return `
+    .map(
+      (day) => `
         <div class="forecast-card">
-          <p class="forecast-date">${label}</p>
-          <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" alt="${day.weather[0].description}" />
-          <p class="forecast-temp">${Math.round(day.main.temp)}°C</p>
+          <p class="forecast-date">${day.label}</p>
+          <img src="https://openweathermap.org/img/wn/${day.icon}.png" alt="${day.description}" />
+          <p class="forecast-temp-max">${Math.round(day.max)}°</p>
+          <p class="forecast-temp-min">${Math.round(day.min)}°</p>
         </div>
-      `;
-    })
+      `
+    )
     .join("");
 
   forecastEl.classList.remove("hidden");
