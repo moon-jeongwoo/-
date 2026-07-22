@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>날씨 앱</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <main class="card">
+    <h1>날씨 조회</h1>
+
+    <form id="search-form">
+      <input type="text" id="city-input" placeholder="도시 이름 (예: Seoul)" required />
+      <button type="submit">검색</button>
+    </form>
+
+    <button id="locate-btn" type="button" class="locate-btn">📍 내 위치 날씨</button>
+
+    <section id="result" class="result hidden">
+      <img id="weather-icon" class="icon" alt="" />
+      <h2 id="city-name"></h2>
+      <p id="description"></p>
+      <p id="temperature"></p>
+      <p id="humidity"></p>
+    </section>
+
+    <div id="hourly" class="hourly hidden"></div>
+
+    <div id="forecast" class="forecast hidden"></div>
+
+    <p id="error" class="error hidden"></p>
+  </main>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="weather-bg.js"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
