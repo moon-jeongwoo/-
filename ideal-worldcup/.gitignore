@@ -1,0 +1,5 @@
+# SQLite 데이터 파일 - 실행할 때마다 생기는 실제 데이터라 git에 안 올림
+data/*.db
+
+__pycache__/
+*.pyc

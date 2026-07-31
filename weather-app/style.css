@@ -46,12 +46,68 @@ h1 {
   margin-bottom: 16px;
 }
 
-#city-input {
+.input-wrapper {
+  position: relative;
   flex: 1;
-  padding: 10px 12px;
+}
+
+#city-input {
+  width: 100%;
+  padding: 10px 32px 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
+}
+
+.city-dropdown-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  color: #888;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.city-dropdown-toggle:hover {
+  background: none;
+  color: #555;
+}
+
+.city-dropdown-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  z-index: 5;
+  padding: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  text-align: left;
+}
+
+.city-option-btn {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  background: #f2f6fb;
+  color: #333;
+  flex: 0 0 auto;
+}
+
+.city-option-btn:hover {
+  background: #dcecfe;
 }
 
 button {
@@ -87,6 +143,48 @@ button:hover {
 .result p {
   margin: 4px 0;
   color: #555;
+}
+
+.city-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.candidates-toggle {
+  background: none;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  color: #888;
+  line-height: 1;
+}
+
+.candidates-toggle:hover {
+  background: none;
+  color: #555;
+}
+
+.city-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.candidate-btn {
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  background: #eef6ff;
+  color: #2b7fd6;
+}
+
+.candidate-btn:hover {
+  background: #dcecfe;
 }
 
 #temperature {

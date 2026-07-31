@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이상형 월드컵</title>
+    <link rel="stylesheet" href="/style.css?v=3" />
+  </head>
+  <body>
+    <div class="page">
+      <h1>🏆 이상형 월드컵</h1>
+
+      <div class="card">
+        <h2>원하는 이상형을 고르세요</h2>
+        <p class="muted" id="quick-start-category">여자 아이돌 이상형 월드컵</p>
+        <div id="quick-start-sizes" class="size-buttons"></div>
+      </div>
+
+      <div id="tournament-list"></div>
+
+      <div class="card">
+        <h2>직접 만들기</h2>
+        <form id="create-form">
+          <label for="title">대회 제목</label>
+          <input type="text" id="title" required placeholder="예: 최고의 라면은?" />
+
+          <label for="size">대결 규모</label>
+          <select id="size">
+            <option value="4">4강</option>
+            <option value="8" selected>8강</option>
+            <option value="16">16강</option>
+            <option value="32">32강</option>
+          </select>
+
+          <div id="candidate-inputs" class="candidate-inputs"></div>
+          <datalist id="saved-candidate-names"></datalist>
+
+          <button type="submit" class="btn-primary" style="margin-top: 16px">대회 시작</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="/api.js?v=3"></script>
+    <script src="/home.js?v=3"></script>
+  </body>
+</html>

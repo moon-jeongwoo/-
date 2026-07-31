@@ -7,10 +7,14 @@ const cityNameEl = document.getElementById("city-name");
 const descriptionEl = document.getElementById("description");
 const temperatureEl = document.getElementById("temperature");
 const humidityEl = document.getElementById("humidity");
+const windEl = document.getElementById("wind");
 const iconEl = document.getElementById("weather-icon");
 const forecastEl = document.getElementById("forecast");
 const hourlyEl = document.getElementById("hourly");
-const cityListEl = document.getElementById("city-list");
+const candidatesToggleEl = document.getElementById("candidates-toggle");
+const candidatesEl = document.getElementById("city-candidates");
+const cityDropdownToggleEl = document.getElementById("city-dropdown-toggle");
+const cityDropdownListEl = document.getElementById("city-dropdown-list");
 
 const CITY_ALIASES = {
   "서울": "Seoul",
@@ -53,15 +57,41 @@ const CITY_ALIASES = {
   "밴쿠버": "Vancouver",
 };
 
-cityListEl.innerHTML = Object.keys(CITY_ALIASES)
-  .map((name) => `<option value="${name}"></option>`)
+cityDropdownListEl.innerHTML = Object.keys(CITY_ALIASES)
+  .map((name) => `<button type="button" class="city-option-btn" data-name="${name}">${name}</button>`)
   .join("");
+
+cityDropdownListEl.querySelectorAll(".city-option-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const name = btn.dataset.name;
+    cityInput.value = name;
+    cityDropdownListEl.classList.add("hidden");
+    loadWeather({ q: name });
+  });
+});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const city = cityInput.value.trim();
   if (!city) return;
+  cityDropdownListEl.classList.add("hidden");
   await loadWeather({ q: city });
+});
+
+// 입력창에 이미 목록에 없는 텍스트가 들어있어도 화살표를 누르면 항상 전체 목록이 뜨도록,
+// 브라우저 기본 datalist(현재 입력값과 일치하는 항목만 필터링)가 아닌 자체 드롭다운을 사용한다.
+cityDropdownToggleEl.addEventListener("click", () => {
+  cityDropdownListEl.classList.toggle("hidden");
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".input-wrapper")) {
+    cityDropdownListEl.classList.add("hidden");
+  }
+});
+
+candidatesToggleEl.addEventListener("click", () => {
+  candidatesEl.classList.toggle("hidden");
 });
 
 locateBtn.addEventListener("click", () => {
@@ -84,15 +114,19 @@ async function loadWeather(location) {
   forecastEl.classList.add("hidden");
   hourlyEl.classList.add("hidden");
   errorEl.classList.add("hidden");
+  candidatesEl.classList.add("hidden");
+  candidatesEl.innerHTML = "";
+  candidatesToggleEl.classList.add("hidden");
 
   try {
     let coords = location;
-    let displayName = null;
+    let displayName = location.displayName || null;
 
     if (location.q) {
-      const place = await geocodeCity(location.q);
-      coords = { lat: place.lat, lon: place.lon };
-      displayName = place.displayName;
+      const geo = await geocodeCity(location.q);
+      coords = { lat: geo.place.lat, lon: geo.place.lon };
+      displayName = geo.place.displayName;
+      showCandidates(geo.alternatives);
     }
 
     const current = await fetchCurrent(coords);
@@ -135,10 +169,36 @@ async function geocodeCity(query) {
   const match = candidates.find((r) => r.country === "KR") || candidates[0];
 
   return {
-    lat: match.lat,
-    lon: match.lon,
-    displayName: (match.local_names && match.local_names.ko) || match.name,
+    place: {
+      lat: match.lat,
+      lon: match.lon,
+      displayName: (match.local_names && match.local_names.ko) || match.name,
+    },
+    alternatives: results.filter((r) => r !== match),
   };
+}
+
+function candidateLabel(r) {
+  const name = (r.local_names && r.local_names.ko) || r.name;
+  const region = r.state ? `${r.state}, ${r.country}` : r.country;
+  return `${name} (${region})`;
+}
+
+function showCandidates(alternatives) {
+  if (!alternatives.length) return;
+
+  candidatesToggleEl.classList.remove("hidden");
+  candidatesEl.innerHTML = alternatives
+    .slice(0, 5)
+    .map((r, i) => `<button type="button" class="candidate-btn" data-index="${i}">${candidateLabel(r)}</button>`)
+    .join("");
+
+  candidatesEl.querySelectorAll(".candidate-btn").forEach((btn, i) => {
+    btn.addEventListener("click", () => {
+      const r = alternatives[i];
+      loadWeather({ lat: r.lat, lon: r.lon, displayName: candidateLabel(r) });
+    });
+  });
 }
 
 function buildQuery(location) {
@@ -184,11 +244,20 @@ function localDate(entry, timezoneOffset) {
   return new Date((entry.dt + timezoneOffset) * 1000);
 }
 
+const WIND_DIRECTIONS = ["북", "북동", "동", "남동", "남", "남서", "서", "북서"];
+
+function windDirectionLabel(deg) {
+  return WIND_DIRECTIONS[Math.round(deg / 45) % 8];
+}
+
 function showResult(data, displayName) {
   cityNameEl.textContent = displayName || data.name;
   descriptionEl.textContent = data.weather[0].description;
   temperatureEl.textContent = `${Math.round(data.main.temp)}°C`;
   humidityEl.textContent = `습도 ${data.main.humidity}%`;
+  windEl.textContent = data.wind
+    ? `바람 ${windDirectionLabel(data.wind.deg)} ${data.wind.speed.toFixed(1)}m/s`
+    : "";
   iconEl.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
   iconEl.alt = data.weather[0].description;
   result.classList.remove("hidden");
@@ -255,11 +324,15 @@ function showHourly(hours, timezoneOffset) {
   hourlyEl.innerHTML = hours
     .map((hour) => {
       const local = localDate(hour, timezoneOffset);
-      const label = `${local.getUTCHours()}시`;
+      const hourOfDay = local.getUTCHours();
+      const label = `${hourOfDay}시`;
+      const isNightWindow = hourOfDay >= 21 || hourOfDay <= 3;
+      const conditionCode = hour.weather[0].icon.slice(0, 2);
+      const displayIcon = `${conditionCode}${isNightWindow ? "n" : "d"}`;
       return `
         <div class="hourly-card">
           <p class="hourly-time">${label}</p>
-          <img src="https://openweathermap.org/img/wn/${hour.weather[0].icon}.png" alt="${hour.weather[0].description}" />
+          <img src="https://openweathermap.org/img/wn/${displayIcon}.png" alt="${hour.weather[0].description}" />
           <p class="hourly-temp">${Math.round(hour.main.temp)}°</p>
         </div>
       `;

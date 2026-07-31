@@ -3,7 +3,28 @@
     "allow": [
       "Bash(where node *)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)",
+      "Bash(git config *)",
+      "Bash(git push *)",
+      "Bash(git -C \"C:\\\\Users\\\\USER\\\\claude study\" log --oneline -20)",
+      "Bash(mkdir -p weather-app)",
+      "Bash(git mv *)",
+      "Bash(mv config.js weather-app/)",
+      "Bash(cd \"C:\\\\Users\\\\USER\\\\claude study\" && rm -f .claude/.gitignore .claude/config.example.js .claude/config.js .claude/index.html .claude/script.js .claude/style.css .claude/weather-bg.js && ls -la .claude/)",
+      "Bash(mkdir -p \"C:/Users/USER/claude study/ideal-worldcup/app\" \"C:/Users/USER/claude study/ideal-worldcup/static\" \"C:/Users/USER/claude study/ideal-worldcup/data\")",
+      "Bash(pip install *)",
+      "Bash(python -c \"from app.main import app; print\\('import ok'\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python3 -c \"import sqlite3; print\\(sqlite3.sqlite_version\\)\")",
+      "Bash(python -c \"import sqlite3; print\\(sqlite3.sqlite_version\\)\")",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebSearch",
+      "mcp__visualize__read_me",
+      "Bash(gh repo *)",
+      "Bash(grep -E \"node_modules|\\\\.env$|data/app\\\\.db|config\\\\.js$\")"
     ]
   }
 }

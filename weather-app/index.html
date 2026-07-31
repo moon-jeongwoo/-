@@ -13,8 +13,11 @@
     <h1>날씨 조회</h1>
 
     <form id="search-form">
-      <input type="text" id="city-input" list="city-list" placeholder="도시 이름 (예: Seoul, 서울)" required autocomplete="off" />
-      <datalist id="city-list"></datalist>
+      <div class="input-wrapper">
+        <input type="text" id="city-input" placeholder="도시 이름 (예: Seoul, 서울)" required autocomplete="off" />
+        <button type="button" id="city-dropdown-toggle" class="city-dropdown-toggle" aria-label="도시 목록 더보기">▼</button>
+        <div id="city-dropdown-list" class="city-dropdown-list hidden"></div>
+      </div>
       <button type="submit">검색</button>
     </form>
 
@@ -22,10 +25,15 @@
 
     <section id="result" class="result hidden">
       <img id="weather-icon" class="icon" alt="" />
-      <h2 id="city-name"></h2>
+      <div class="city-name-row">
+        <h2 id="city-name"></h2>
+        <button id="candidates-toggle" type="button" class="candidates-toggle hidden" aria-label="다른 지역 더보기">▼</button>
+      </div>
       <p id="description"></p>
       <p id="temperature"></p>
       <p id="humidity"></p>
+      <p id="wind"></p>
+      <div id="city-candidates" class="city-candidates hidden"></div>
     </section>
 
     <div id="hourly" class="hourly hidden"></div>
